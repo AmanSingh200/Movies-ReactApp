@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 // import { movies } from './getmovies'
 import axios from 'axios';
+import { movies } from './getmovies';
 
 export default class Movies extends Component {
     constructor(){
@@ -9,7 +10,8 @@ export default class Movies extends Component {
             hover:'',
             parr:[1],
             currPage:1,
-            movies:[] 
+            movies:[],
+            favourites:[] 
         }
     }
     async componentDidMount(){
@@ -67,8 +69,30 @@ export default class Movies extends Component {
                 currPage:value
             },this.changeMovies) 
         }
+    }
+
+    handleFavourites=(movie)=>{
+        let oldData=JSON.parse(localStorage.getItem('movies-app')||"[]")
+        if (this.state.favourites.includes(movies.id)){
+            oldData=oldData.filter((m)=>m.id!=movie.id)
+        }else 
+        {
+            oldData.push(movie)
+        }
+        localStorage.setItem("movies-app",JSON.stringify(oldData));
+        this.handleFavouritesState();
 
     }
+
+    handleFavouritesState=()=>{
+        let oldData=JSON.parse(localStorage.getItem('movies-app')||"[]")
+        let temp=oldData.map((movie)=>movies.id);
+        this.setState({
+            favourites:[...temp]
+        })
+    }
+
+
   render() {
        // let movie=movies.results
          console.log("render");
@@ -91,7 +115,7 @@ export default class Movies extends Component {
                                {/* <p class="card-text movies-text">{movieObj.overview}</p> */}
                                <div className="button-wrapper" style={{display:'flex',width:'100%',justifyContent:'center'}}>{
                                    this.state.hover==movieObj.id && 
-                                   <a className="btn btn-primary movies-button">Add to Favourites</a>
+                                   <a className="btn btn-primary movies-button" onClick={()=>this.handleFavourites(movieObj)}>{this.state.favourites.includes(movieObj.id)?"Remove From Favourites":"Add to Favourites"}</a>
                                }
                                 
                                 </div>
